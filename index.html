@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contacts</title>
+    <link href="https://stackpath.bootstrapcdn.com/bootswatch/4.5.2/cerulean/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="mb-4">Contact List</h1>
+        <form id="contactForm">
+            <div class="form-group">
+                <label for="name">Name</label>
+                <input type="text" class="form-control" id="name" required>
+            </div>
+            <div class="form-group">
+                <label for="phone">Phone Number</label>
+                <input type="tel" class="form-control" id="phone" required>
+            </div>
+            <button type="submit" class="btn btn-primary">Add Contact</button>
+        </form>
+        <hr>
+        <h2>Contacts</h2>
+        <ul id="contactList" class="list-group mt-3">
+        </ul>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        function displayContacts() {
+            var contacts = JSON.parse(localStorage.getItem('contacts')) || [];
+            var contactList = document.getElementById('contactList');
+            contactList.innerHTML = '';
+            contacts.forEach(function(contact) {
+                var listItem = document.createElement('li');
+                listItem.className = 'list-group-item';
+                listItem.innerHTML = `
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>${contact.name} - ${contact.phone}</div>
+                        <button class="btn btn-danger btn-sm" onclick="deleteContact(${contact.id})">X</button>
+                    </div>
+                `;
+                contactList.appendChild(listItem);
+            });
+        }
+        function addContact(name, phone) {
+            var contacts = JSON.parse(localStorage.getItem('contacts')) || [];
+            var id = Date.now();
+            var contact = { id: id, name: name, phone: phone };
+            contacts.push(contact);
+            localStorage.setItem('contacts', JSON.stringify(contacts));
+            return id;
+        }
+
+        document.getElementById('contactForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            var name = document.getElementById('name').value;
+            var phone = document.getElementById('phone').value;
+            var id = addContact(name, phone);
+            displayContacts();
+            document.getElementById('contactForm').reset();
+        });
+
+        function deleteContact(id) {
+            var contacts = JSON.parse(localStorage.getItem('contacts')) || [];
+            var updatedContacts = contacts.filter(function(contact) {
+                return contact.id !== id;
+            });
+            localStorage.setItem('contacts', JSON.stringify(updatedContacts));
+            displayContacts();
+        }
+        displayContacts();
+    </script>
+</body>
+</html>
